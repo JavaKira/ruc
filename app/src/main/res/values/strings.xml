@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Ruc</string>
+    <string name="todo">TODO</string>
+    <string name="tomorrowText">Расписание на завтра</string>
 </resources>
