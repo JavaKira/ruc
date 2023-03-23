@@ -2,4 +2,9 @@
     <string name="app_name">Ruc</string>
     <string name="todo">TODO</string>
     <string name="tomorrowText">Расписание на завтра</string>
+    <string name="item_title">1. Литература</string>
+    <string name="item_time">8:30-10:10</string>
+    <string name="item_name">Курасова Виктория Анатольевна</string>
+    <string name="item_place">ауд. В-202</string>
+    <string name="item_type">практические занятия</string>
 </resources>
