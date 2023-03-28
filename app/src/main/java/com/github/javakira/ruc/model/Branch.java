@@ -1,11 +1,11 @@
 package com.github.javakira.ruc.model;
 
-public class Employee implements SpinnerItem {
-    public static final Employee empty = new Employee("--", "");
+public class Branch implements SpinnerItem {
+    public static final Branch empty = new Branch("--", "");
     private final String title;
     private final String value;
 
-    public Employee(String title, String value) {
+    public Branch(String title, String value) {
         this.title = title;
         this.value = value;
     }

@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.github.javakira.ruc.model.Branch;
+import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.Pair;
 
 import org.jsoup.Connection;
@@ -24,8 +26,59 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 public class RucParser {
     public static String link = "https://schedule.ruc.su/employee/";
+
+    public static void useBranches(Function<Branch, Void> post) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            Elements elements;
+
+            try {
+                Connection connection = Jsoup.connect(link);
+                Document document = connection.post();
+                Element employee = document.getElementsByAttribute("name").stream()
+                        .filter(element -> element.attr("name").equals("branch"))
+                        .collect(Collectors.toList()).get(0);
+                elements = employee.children();
+                elements.remove(0);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            handler.post(() -> elements.forEach(element -> post.apply(new Branch(element.text(), element.attr("value")))));
+        });
+    }
+
+    public static void useEmployees(String branch, Function<Employee, Void> post) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            Elements elements;
+
+            try {
+                Connection connection = Jsoup.connect(link);
+                HashMap<String, String> data = new HashMap<>();
+                data.put("branch", branch);
+                connection.data(data);
+                Document document = connection.post();
+                Element employee = document.getElementsByAttribute("name").stream()
+                        .filter(element -> element.attr("name").equals("employee"))
+                        .collect(Collectors.toList()).get(0);
+                elements = employee.children();
+                elements.remove(0);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            handler.post(() -> elements.forEach(element -> post.apply(new Employee(element.text(), element.attr("value")))));
+        });
+    }
 
     public static void usePairs(String branch, Date date, String employee, Function<Pair, Void> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();

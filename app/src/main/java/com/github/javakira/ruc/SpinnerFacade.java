@@ -10,11 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.javakira.ruc.adapter.SpinnerAdapter;
-import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.SpinnerItem;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SpinnerFacade {
@@ -25,14 +24,16 @@ public class SpinnerFacade {
     private SpinnerItem item;
     private Context context;
     private List<SpinnerItem> items;
+    private Consumer<SpinnerItem> onChangeItem;
 
-    public SpinnerFacade(RecyclerView recycler, TextView mainTitle, CardView main, SpinnerItem item, Context context, List<SpinnerItem> items) {
+    public SpinnerFacade(RecyclerView recycler, TextView mainTitle, CardView main, SpinnerItem item, Context context, List<SpinnerItem> items, Consumer<SpinnerItem> onChangeItem) {
         this.recycler = recycler;
         this.mainTitle = mainTitle;
         this.main = main;
         this.item = item;
         this.context = context;
         this.items = items;
+        this.onChangeItem = onChangeItem;
 
         main.setOnClickListener(view -> {
             if (recycler.getVisibility() == View.VISIBLE)
@@ -41,7 +42,7 @@ public class SpinnerFacade {
                 recycler.setVisibility(View.VISIBLE);
         });
 
-        updateBranchItem(item);
+        mainTitle.setText(item.getTitle());
         setRecycler();
     }
 
@@ -65,6 +66,7 @@ public class SpinnerFacade {
     private void updateBranchItem(SpinnerItem item) {
         this.item = item;
         mainTitle.setText(item.getTitle());
+        onChangeItem.accept(item);
     }
 
     public SpinnerItem getItem() {

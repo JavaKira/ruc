@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (!FileIO.isExist("config.txt", this)) {
+        if (FileIO.isExist("config.txt", this)) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
@@ -55,4 +55,6 @@ public class MainActivity extends AppCompatActivity {
             return null;
         });
     }
+
+
 }
