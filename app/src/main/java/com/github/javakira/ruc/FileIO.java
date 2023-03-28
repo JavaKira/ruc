@@ -17,7 +17,8 @@ public class FileIO {
     public static Properties loadProps(String filename, Context context) {
         Properties properties = new Properties();
         try {
-            properties.load(context.openFileInput(filename));
+            if (isExist(filename, context))
+                properties.load(context.openFileInput(filename));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
