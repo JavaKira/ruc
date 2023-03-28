@@ -14,6 +14,8 @@ import com.github.javakira.ruc.parser.RucParser;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.function.Function;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,10 +44,11 @@ public class MainActivity extends AppCompatActivity {
         pairAdapter = new PairAdapter(this, pairList);
         pairRecycler.setAdapter(pairAdapter);
 
+        Properties properties = FileIO.loadProps("config.txt", this);
         RucParser.usePairs(
-                "4935b400-0858-11e0-8be3-005056bd3ce5",
+                Objects.requireNonNull(properties.get("branch")).toString(),
                 new Date(),
-                "3c14c52e-132f-11ed-b15e-3cecef02455b",
+                Objects.requireNonNull(properties.get("employee")).toString(),
                 (Function<Pair, Void>) pair -> {
             pairList.add(pair);
             pairAdapter.notifyItemInserted(pairList.size() - 1);

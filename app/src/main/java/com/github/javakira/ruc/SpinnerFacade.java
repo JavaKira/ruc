@@ -66,4 +66,8 @@ public class SpinnerFacade {
         this.item = item;
         mainTitle.setText(item.getTitle());
     }
+
+    public SpinnerItem getItem() {
+        return item;
+    }
 }
