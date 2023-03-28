@@ -9,18 +9,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Properties;
 
 public class FileIO {
     public static String tag = "ruc FileIO";
 
-    public static void writeToFile(String data, String filename, Context context) {
+    public static Properties loadProps(String filename, Context context) {
+        Properties properties = new Properties();
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(filename, Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
+            properties.load(context.openFileInput(filename));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        catch (IOException e) {
-            Log.e(tag, "File write failed: " + e);
+
+        return properties;
+    }
+
+    public static void writeProps(String filename, Context context, Properties properties) {
+        try {
+            properties.store(context.openFileOutput(filename, Context.MODE_PRIVATE), "");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -32,35 +41,5 @@ public class FileIO {
         }
 
         return false;
-    }
-
-    public static String readFromFile(String filename, Context context) {
-
-        String ret = "";
-
-        try {
-            InputStream inputStream = context.openFileInput(filename);
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append("\n").append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        }
-        catch (FileNotFoundException e) {
-            Log.e(tag, "File not found: " + e);
-        } catch (IOException e) {
-            Log.e(tag, "Can not read file: " + e);
-        }
-
-        return ret;
     }
 }
