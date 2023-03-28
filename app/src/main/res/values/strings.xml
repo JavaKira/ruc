@@ -7,4 +7,8 @@
     <string name="item_name">Курасова Виктория Анатольевна</string>
     <string name="item_place">ауд. В-202</string>
     <string name="item_type">практические занятия</string>
+    <string name="settings_first_title">Настрой меня</string>
+    <string name="branch">филиал</string>
+    <string name="settings_first_end">закончить</string>
+    <string name="settings_first_employee">работник</string>
 </resources>

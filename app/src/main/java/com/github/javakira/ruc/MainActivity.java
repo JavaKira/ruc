@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (!FileIO.isExist("config.txt", this)) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
 
         pairRecycler = findViewById(R.id.pairRecycler);
         List<Pair> pairList = new ArrayList<>();
