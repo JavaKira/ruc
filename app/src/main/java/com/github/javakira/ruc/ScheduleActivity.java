@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.github.javakira.ruc.adapter.PairAdapter;
 import com.github.javakira.ruc.model.Card;
@@ -20,14 +19,14 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-public class MainActivity extends AppCompatActivity {
+public class ScheduleActivity extends AppCompatActivity {
     private RecyclerView pairRecycler;
     private PairAdapter pairAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_schedule);
 
         if (FileIO.isExist("config.txt", this)) {
             Intent intent = new Intent(this, SettingsActivity.class);
