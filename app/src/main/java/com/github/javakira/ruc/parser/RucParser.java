@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.github.javakira.ruc.model.Branch;
+import com.github.javakira.ruc.model.Card;
 import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.Pair;
 import com.github.javakira.ruc.model.SpinnerItem;
@@ -82,10 +83,10 @@ public class RucParser {
         });
     }
 
-    public static void usePairs(String branch, Date date, String employee, Consumer<Pair> post) {
+    public static void useCards(String branch, String employee, Consumer<Card> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-        List<Pair> pairList = new ArrayList<>();
+        List<Card> cardList = new ArrayList<>();
 
         executor.execute(() -> {
             try {
@@ -97,31 +98,36 @@ public class RucParser {
                 Document document = connection.post();
 
                 Elements cards = document.getElementsByClass("card");
-                if (cards.size() <= 1)
-                    return;
+                for (Element cardElement : cards) {
+                    List<Pair> pairList = new ArrayList<>();
+                    if (cards.size() <= 1)
+                        return;
 
-                Elements pairs = cards.get(1).children();
-                pairs.remove(0);
+                    Elements pairs = cardElement.children();
+                    pairs.remove(0);
 
 
-                for (Element element : pairs) {
-                    String pairName = element.children().first().text();
-                    String text = element.toString().replace(pairName, "").replace("Группа", "").trim();
-                    Matcher matcher = Pattern.compile("[0-9].").matcher(pairName);
-                    matcher.find();
-                    int pairIndex = Integer.parseInt(pairName.substring(matcher.start(), matcher.end() - 1));
-                    pairName = pairName.replaceAll("[0-9].", "");
-                    String[] split = text.split("<br>");
-                    String[] split1 = split[2].split(",");
+                    for (Element element : pairs) {
+                        String pairName = element.children().first().text();
+                        String text = element.toString().replace(pairName, "").replace("Группа", "").trim();
+                        Matcher matcher = Pattern.compile("[0-9].").matcher(pairName);
+                        matcher.find();
+                        int pairIndex = Integer.parseInt(pairName.substring(matcher.start(), matcher.end() - 1));
+                        pairName = pairName.replaceAll("[0-9].", "");
+                        String[] split = text.split("<br>");
+                        String[] split1 = split[2].split(",");
 
-                    pairList.add(new Pair(
-                            pairIndex - 1,
-                            pairName.trim(),
-                            split[1].trim(),
-                            split1[0].trim(),
-                            split1[1].trim(),
-                            split[1].trim()
-                    ));
+                        pairList.add(new Pair(
+                                pairIndex - 1,
+                                pairName.trim(),
+                                split[1].trim(),
+                                split1[0].trim(),
+                                split1[1].trim(),
+                                split[1].trim()
+                        ));
+                    }
+
+                    cardList.add(new Card(new Date(), pairList));
                 }
             } catch (IOException e) {
                 HashMap<String, String> data = new HashMap<>();
@@ -130,7 +136,7 @@ public class RucParser {
                 Log.e("RUC RucParser ", data + " : " + e);
             }
 
-            handler.post(() -> pairList.forEach(post));
+            handler.post(() -> cardList.forEach(post));
         });
     }
 }

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.github.javakira.ruc.adapter.PairAdapter;
+import com.github.javakira.ruc.model.Card;
 import com.github.javakira.ruc.model.Pair;
 import com.github.javakira.ruc.parser.RucParser;
 
@@ -45,12 +46,11 @@ public class MainActivity extends AppCompatActivity {
         pairRecycler.setAdapter(pairAdapter);
 
         Properties properties = FileIO.loadProps("config.txt", this);
-        RucParser.usePairs(
+        RucParser.useCards(
                 Objects.requireNonNull(properties.get("branch")).toString(),
-                new Date(),
                 Objects.requireNonNull(properties.get("employee")).toString(),
-                (Consumer<Pair>) pair -> {
-            pairList.add(pair);
+                (Consumer<Card>) card -> {
+            pairList.addAll(card.getPairList());
             pairAdapter.notifyItemInserted(pairList.size() - 1);
         });
     }
