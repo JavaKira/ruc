@@ -18,11 +18,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -104,6 +107,7 @@ public class RucParser {
                         return;
 
                     Elements pairs = cardElement.children();
+                    Element header = pairs.get(0);
                     pairs.remove(0);
 
 
@@ -127,9 +131,11 @@ public class RucParser {
                         ));
                     }
 
-                    cardList.add(new Card(new Date(), pairList));
+                    String strDate = header.text().split(" ")[0];
+                    SimpleDateFormat parser = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+                    cardList.add(new Card(parser.parse(strDate), pairList));
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 HashMap<String, String> data = new HashMap<>();
                 data.put("branch", branch);
                 data.put("employee", employee);

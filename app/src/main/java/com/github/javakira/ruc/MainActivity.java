@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.github.javakira.ruc.adapter.PairAdapter;
 import com.github.javakira.ruc.model.Card;
@@ -50,8 +51,11 @@ public class MainActivity extends AppCompatActivity {
                 Objects.requireNonNull(properties.get("branch")).toString(),
                 Objects.requireNonNull(properties.get("employee")).toString(),
                 (Consumer<Card>) card -> {
-            pairList.addAll(card.getPairList());
-            pairAdapter.notifyItemInserted(pairList.size() - 1);
+                    Date date = new Date();
+            if (card.getDate().compareTo(new Date(date.getYear(), date.getMonth(), date.getDate() + 1)) == 0) {
+                pairList.addAll(card.getPairList());
+                pairAdapter.notifyItemInserted(pairList.size() - 1);
+            }
         });
     }
 
