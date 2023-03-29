@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView pairRecycler;
@@ -49,10 +49,9 @@ public class MainActivity extends AppCompatActivity {
                 Objects.requireNonNull(properties.get("branch")).toString(),
                 new Date(),
                 Objects.requireNonNull(properties.get("employee")).toString(),
-                (Function<Pair, Void>) pair -> {
+                (Consumer<Pair>) pair -> {
             pairList.add(pair);
             pairAdapter.notifyItemInserted(pairList.size() - 1);
-            return null;
         });
     }
 

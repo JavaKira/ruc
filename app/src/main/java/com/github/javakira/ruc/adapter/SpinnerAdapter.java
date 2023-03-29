@@ -13,14 +13,15 @@ import com.github.javakira.ruc.R;
 import com.github.javakira.ruc.model.SpinnerItem;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SpinnerAdapter extends RecyclerView.Adapter<SpinnerAdapter.SpinnerViewHolder> {
     private final Context context;
     private final List<SpinnerItem> items;
-    private final Function<SpinnerItem, Void> onClick;
+    private final Consumer<SpinnerItem> onClick;
 
-    public SpinnerAdapter(Context context, List<SpinnerItem> items, Function<SpinnerItem, Void> onClick) {
+    public SpinnerAdapter(Context context, List<SpinnerItem> items, Consumer<SpinnerItem> onClick) {
         this.context = context;
         this.items = items;
         this.onClick = onClick;
@@ -38,7 +39,7 @@ public class SpinnerAdapter extends RecyclerView.Adapter<SpinnerAdapter.SpinnerV
         SpinnerItem item = items.get(position);
         holder.title.setText(item.getTitle());
         holder.itemView.setOnClickListener(view -> {
-            onClick.apply(item);
+            onClick.accept(item);
         });
     }
 

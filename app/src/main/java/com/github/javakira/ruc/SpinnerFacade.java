@@ -14,7 +14,6 @@ import com.github.javakira.ruc.model.SpinnerItem;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class SpinnerFacade {
     private RecyclerView recycler;
@@ -49,10 +48,9 @@ public class SpinnerFacade {
     private void setRecycler() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context, RecyclerView.VERTICAL, false);
         recycler.setLayoutManager(layoutManager);
-        spinnerAdapter = new SpinnerAdapter(context, items, (Function<SpinnerItem, Void>) item -> {
+        spinnerAdapter = new SpinnerAdapter(context, items, (Consumer<SpinnerItem>) item -> {
             updateBranchItem(item);
             recycler.setVisibility(View.GONE);
-            return null;
         });
 
         recycler.setAdapter(spinnerAdapter);

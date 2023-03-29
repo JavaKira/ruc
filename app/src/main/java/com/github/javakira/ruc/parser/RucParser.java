@@ -8,6 +8,7 @@ import android.util.Log;
 import com.github.javakira.ruc.model.Branch;
 import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.Pair;
+import com.github.javakira.ruc.model.SpinnerItem;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 public class RucParser {
     public static String link = "https://schedule.ruc.su/employee/";
 
-    public static void useBranches(Function<Branch, Void> post) {
+    public static void useBranches(Consumer<Branch> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -50,11 +52,11 @@ public class RucParser {
                 throw new RuntimeException(e);
             }
 
-            handler.post(() -> elements.forEach(element -> post.apply(new Branch(element.text(), element.attr("value")))));
+            handler.post(() -> elements.forEach(element -> post.accept(new Branch(element.text(), element.attr("value")))));
         });
     }
 
-    public static void useEmployees(String branch, Function<Employee, Void> post) {
+    public static void useEmployees(String branch, Consumer<Employee> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -76,11 +78,11 @@ public class RucParser {
                 throw new RuntimeException(e);
             }
 
-            handler.post(() -> elements.forEach(element -> post.apply(new Employee(element.text(), element.attr("value")))));
+            handler.post(() -> elements.forEach(element -> post.accept(new Employee(element.text(), element.attr("value")))));
         });
     }
 
-    public static void usePairs(String branch, Date date, String employee, Function<Pair, Void> post) {
+    public static void usePairs(String branch, Date date, String employee, Consumer<Pair> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         List<Pair> pairList = new ArrayList<>();
@@ -128,7 +130,7 @@ public class RucParser {
                 Log.e("RUC RucParser ", data + " : " + e);
             }
 
-            handler.post(() -> pairList.forEach(post::apply));
+            handler.post(() -> pairList.forEach(post));
         });
     }
 }

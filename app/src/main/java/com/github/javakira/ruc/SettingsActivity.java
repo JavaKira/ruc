@@ -13,6 +13,7 @@ import com.github.javakira.ruc.parser.RucParser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -26,10 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         List<SpinnerItem> items = new ArrayList<>();
         List<SpinnerItem> items1 = new ArrayList<>();
-        RucParser.useBranches((Function<Branch, Void>) branch -> {
-            items.add(branch);
-            return null;
-        });
+        RucParser.useBranches((Consumer<Branch>) items::add);
 
         branchSpinnerFacade = new SpinnerFacade(
                 findViewById(R.id.settings_first_branch_recycler),
@@ -40,10 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
                 items,
                 item -> {
                     items1.clear();
-                    RucParser.useEmployees(item.getValue(), (Function<Employee, Void>) employee -> {
-                        items1.add(employee);
-                        return null;
-                    });
+                    RucParser.useEmployees(item.getValue(), (Consumer<Employee>) items1::add);
                 });
 
 
