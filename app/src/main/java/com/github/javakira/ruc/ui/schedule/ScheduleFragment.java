@@ -5,26 +5,22 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.javakira.ruc.FileIO;
 import com.github.javakira.ruc.R;
 import com.github.javakira.ruc.SettingsActivity;
-import com.github.javakira.ruc.adapter.PairAdapter;
+import com.github.javakira.ruc.adapter.CardAdapter;
 import com.github.javakira.ruc.databinding.FragmentScheduleBinding;
 import com.github.javakira.ruc.model.Card;
-import com.github.javakira.ruc.model.Pair;
 import com.github.javakira.ruc.parser.RucParser;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
@@ -33,8 +29,7 @@ import java.util.function.Consumer;
 public class ScheduleFragment extends Fragment {
 
     private FragmentScheduleBinding binding;
-    private RecyclerView pairRecycler;
-    private PairAdapter pairAdapter;
+    private RecyclerView cardRecycler;
     private View view;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -53,34 +48,33 @@ public class ScheduleFragment extends Fragment {
             startActivity(intent);
         }
 
-        pairRecycler = view.findViewById(R.id.pairRecycler);
-        List<Pair> pairList = new ArrayList<>();
-        setPairRecycler(pairList);
+        cardRecycler = view.findViewById(R.id.cardRecycler);
+        List<Card> cardList = new ArrayList<>();
+        setCardRecycler(cardList);
+    }
+
+    private void setCardRecycler(List<Card> cardList) {
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false) {
+
+        };
+        cardRecycler = view.findViewById(R.id.cardRecycler);
+        cardRecycler.setLayoutManager(layoutManager);
+        CardAdapter cardAdapter = new CardAdapter(view.getContext(), cardList);
+        cardRecycler.setAdapter(cardAdapter);
+
+        Properties properties = FileIO.loadProps("config.txt", view.getContext());
+        RucParser.useCards(
+                Objects.requireNonNull(properties.get("branch")).toString(),
+                Objects.requireNonNull(properties.get("employee")).toString(),
+                (Consumer<Card>) card -> {
+                    cardList.add(card);
+                    cardAdapter.notifyItemInserted(cardList.size());
+                });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    private void setPairRecycler(List<Pair> pairList) {
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
-        pairRecycler = view.findViewById(R.id.pairRecycler);
-        pairRecycler.setLayoutManager(layoutManager);
-        pairAdapter = new PairAdapter(getContext(), pairList);
-        pairRecycler.setAdapter(pairAdapter);
-
-        Properties properties = FileIO.loadProps("config.txt", getContext());
-        RucParser.useCards(
-                Objects.requireNonNull(properties.get("branch")).toString(),
-                Objects.requireNonNull(properties.get("employee")).toString(),
-                (Consumer<Card>) card -> {
-                    Date date = new Date();
-                    if (card.getDate().compareTo(new Date(date.getYear(), date.getMonth(), date.getDate() + 1)) == 0) {
-                        pairList.addAll(card.getPairList());
-                        pairAdapter.notifyItemInserted(pairList.size() - 1);
-                    }
-                });
     }
 }
