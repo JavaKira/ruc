@@ -42,9 +42,11 @@ public class PairAdapter extends RecyclerView.Adapter<PairAdapter.PairViewHolder
 
     static class PairViewHolder extends RecyclerView.ViewHolder {
         TextView name, time, by, place, type;
+        View view;
 
         public PairViewHolder(@NonNull View itemView) {
             super(itemView);
+            view = itemView;
 
             name = itemView.findViewById(R.id.item_name);
             time = itemView.findViewById(R.id.item_time);
@@ -56,6 +58,7 @@ public class PairAdapter extends RecyclerView.Adapter<PairAdapter.PairViewHolder
         public void visit(Pair pair) {
             name.setText((pair.getIndex() + 1) + ". " + pair.getName());
             by.setText(pair.getBy());
+            time.setText(view.getContext().getResources().getString(R.string.p1 + pair.getIndex()));
             place.setText(pair.getPlace());
             type.setText(pair.getType());
         }
