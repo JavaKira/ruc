@@ -10,4 +10,9 @@
         android:name="com.github.javakira.ruc.ui.schedule.ScheduleFragment"
         android:label="@string/menu_schedule" />
 
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.github.javakira.ruc.ui.schedule.SettingsFragment"
+        android:label="@string/menu_settings" />
+
 </navigation>
