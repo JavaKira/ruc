@@ -29,7 +29,6 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
 public class RucParser {
     public static String link = "https://schedule.ruc.su/employee/";
 
-    public static void useBranches(Consumer<Branch> post) {
+    public static void useBranches(Consumer<List<Branch>> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -56,7 +55,11 @@ public class RucParser {
                 throw new RuntimeException(e);
             }
 
-            handler.post(() -> elements.forEach(element -> post.accept(new Branch(element.text(), element.attr("value")))));
+            handler.post(() -> {
+                List<Branch> branchList = new ArrayList<>();
+                elements.forEach(element -> branchList.add(new Branch(element.text(), element.attr("value"))));
+                post.accept(branchList);
+            });
         });
     }
 

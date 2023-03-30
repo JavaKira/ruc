@@ -61,10 +61,15 @@ public class SpinnerFacade {
         spinnerAdapter.notifyDataSetChanged();
     }
 
-    private void updateBranchItem(SpinnerItem item) {
+    public void updateBranchItem(SpinnerItem item) {
         this.item = item;
         mainTitle.setText(item.getTitle());
         onChangeItem.accept(item);
+    }
+
+    public void updateBranchItemWithoutInvoke(SpinnerItem item) {
+        this.item = item;
+        mainTitle.setText(item.getTitle());
     }
 
     public SpinnerItem getItem() {
