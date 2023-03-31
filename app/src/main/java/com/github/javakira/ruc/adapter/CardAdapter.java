@@ -1,6 +1,7 @@
 package com.github.javakira.ruc.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.github.javakira.ruc.R;
 import com.github.javakira.ruc.model.Card;
 import com.github.javakira.ruc.model.Pair;
 
+import java.util.Date;
 import java.util.List;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
@@ -47,6 +49,19 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         RecyclerView pairRecycler;
         TextView title;
 
+        public static String formatDate(Date date) {
+            Date currentDate = new Date();
+            String base = "Расписание на ";
+
+            if (date.compareTo(new Date(currentDate.getYear(), currentDate.getMonth(), currentDate.getDate())) == 0)
+                return base + "сегодня";
+
+            if (date.compareTo(new Date(currentDate.getYear(), currentDate.getMonth(), currentDate.getDate() + 1)) == 0)
+                return base + "завтра";
+
+            return base + date.getDate() + "." + date.getMonth() + "." + (1900 + date.getYear());
+        }
+
         public CardViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -56,7 +71,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         }
 
         public void visit(Card card) {
-            title.setText(card.getDate().toString());
+            title.setText(formatDate(card.getDate()));
             setPairRecycler(card.getPairList());
         }
 
