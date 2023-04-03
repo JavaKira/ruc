@@ -9,12 +9,12 @@ import com.github.javakira.ruc.model.Branch;
 import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.SpinnerItem;
 import com.github.javakira.ruc.parser.RucParser;
+import com.github.javakira.ruc.utils.FileIO;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class SettingsActivity extends AppCompatActivity {
     private SpinnerFacade branchSpinnerFacade;
@@ -59,10 +59,10 @@ public class SettingsActivity extends AppCompatActivity {
             if(employeeSpinnerFacade.getItem() == Employee.empty)
                 return;
 
-            Properties properties = FileIO.loadProps("config.txt", this);
+            Properties properties = FileIO.loadProps(this);
             properties.setProperty("branch", branchSpinnerFacade.getItem().getValue());
             properties.setProperty("employee", employeeSpinnerFacade.getItem().getValue());
-            FileIO.writeProps("config.txt", this, properties);
+            FileIO.writeProps(this, properties);
             finish();
         });
     }

@@ -1,7 +1,6 @@
 package com.github.javakira.ruc.ui.schedule;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.github.javakira.ruc.FileIO;
+import com.github.javakira.ruc.utils.FileIO;
 import com.github.javakira.ruc.R;
 import com.github.javakira.ruc.SpinnerFacade;
 import com.github.javakira.ruc.databinding.FragmentSettingsBinding;
@@ -21,7 +20,6 @@ import com.github.javakira.ruc.parser.RucParser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -40,7 +38,7 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         List<SpinnerItem> items = new ArrayList<>();
         List<SpinnerItem> items1 = new ArrayList<>();
-        Properties properties = FileIO.loadProps("config.txt", getContext());
+        Properties properties = FileIO.loadProps(getContext());
 
         SpinnerFacade employeeSpinnerFacade = new SpinnerFacade(
                 view.findViewById(R.id.settings_employee_recycler),
@@ -51,7 +49,7 @@ public class SettingsFragment extends Fragment {
                 items1,
                 item -> {
                     properties.setProperty("employee", item.getValue());
-                    FileIO.writeProps("config.txt", requireContext(), properties);
+                    FileIO.writeProps(requireContext(), properties);
                 });
 
         SpinnerFacade branchSpinnerFacade = new SpinnerFacade(
@@ -63,7 +61,7 @@ public class SettingsFragment extends Fragment {
                 items,
                 item -> {
                     properties.setProperty("branch", item.getValue());
-                    FileIO.writeProps("config.txt", requireContext(), properties);
+                    FileIO.writeProps(requireContext(), properties);
                     items1.clear();
                     RucParser.useEmployees(item.getValue(), (Consumer<Employee>) employee -> {
                         items1.add(employee);

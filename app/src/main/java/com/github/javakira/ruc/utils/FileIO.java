@@ -9,13 +9,14 @@ import java.util.Arrays;
 import java.util.Properties;
 
 public class FileIO {
-    public static String tag = "ruc FileIO";
+    public static final String tag = "ruc FileIO";
+    public static final String propsFileName = "config.txt";
 
-    public static Properties loadProps(String filename, Context context) {
+    public static Properties loadProps(Context context) {
         Properties properties = new Properties();
         try {
-            if (isExist(filename, context))
-                properties.load(context.openFileInput(filename));
+            if (isExist(propsFileName, context))
+                properties.load(context.openFileInput(propsFileName));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -23,9 +24,9 @@ public class FileIO {
         return properties;
     }
 
-    public static void writeProps(String filename, Context context, Properties properties) {
+    public static void writeProps(Context context, Properties properties) {
         try {
-            properties.store(context.openFileOutput(filename, Context.MODE_PRIVATE), "");
+            properties.store(context.openFileOutput(propsFileName, Context.MODE_PRIVATE), "");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

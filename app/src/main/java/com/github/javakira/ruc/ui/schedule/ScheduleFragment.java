@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.javakira.ruc.FileIO;
+import com.github.javakira.ruc.utils.FileIO;
 import com.github.javakira.ruc.R;
 import com.github.javakira.ruc.SettingsActivity;
 import com.github.javakira.ruc.adapter.CardAdapter;
@@ -62,7 +62,7 @@ public class ScheduleFragment extends Fragment {
         CardAdapter cardAdapter = new CardAdapter(view.getContext(), cardList);
         cardRecycler.setAdapter(cardAdapter);
 
-        Properties properties = FileIO.loadProps("config.txt", view.getContext());
+        Properties properties = FileIO.loadProps(view.getContext());
         RucParser.useCards(
                 Objects.requireNonNull(properties.get("branch")).toString(),
                 Objects.requireNonNull(properties.get("employee")).toString(),
