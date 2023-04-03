@@ -1,4 +1,4 @@
-package com.github.javakira.ruc;
+package com.github.javakira.ruc.utils;
 
 import android.content.Context;
 import android.util.Log;
