@@ -63,7 +63,7 @@ public class ScheduleFragment extends Fragment {
         cardRecycler.setAdapter(cardAdapter);
 
         Properties properties = FileIO.loadProps(view.getContext());
-        RucParser.useCards(
+        RucParser.useEmployeeCards(
                 Objects.requireNonNull(properties.get("branch")).toString(),
                 Objects.requireNonNull(properties.get("employee")).toString(),
                 (Consumer<Card>) card -> {

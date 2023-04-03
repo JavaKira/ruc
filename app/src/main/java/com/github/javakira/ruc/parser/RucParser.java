@@ -8,6 +8,8 @@ import android.util.Log;
 import com.github.javakira.ruc.model.Branch;
 import com.github.javakira.ruc.model.Card;
 import com.github.javakira.ruc.model.Employee;
+import com.github.javakira.ruc.model.Group;
+import com.github.javakira.ruc.model.Kit;
 import com.github.javakira.ruc.model.Pair;
 import com.github.javakira.ruc.model.SpinnerItem;
 
@@ -34,7 +36,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class RucParser {
-    public static String link = "https://schedule.ruc.su/employee/";
+    public static String link = "https://schedule.ruc.su/";
+    public static String employeeLink = "https://schedule.ruc.su/employee/";
 
     public static void useBranches(Consumer<List<Branch>> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -63,6 +66,59 @@ public class RucParser {
         });
     }
 
+    public static void useKits(String branch, Consumer<Kit> post) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            Elements elements;
+
+            try {
+                Connection connection = Jsoup.connect(employeeLink);
+                HashMap<String, String> data = new HashMap<>();
+                data.put("branch", branch);
+                connection.data(data);
+                Document document = connection.post();
+                Element employee = document.getElementsByAttribute("name").stream()
+                        .filter(element -> element.attr("name").equals("year"))
+                        .collect(Collectors.toList()).get(0);
+                elements = employee.children();
+                elements.remove(0);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            handler.post(() -> elements.forEach(element -> post.accept(new Kit(element.text(), element.attr("value")))));
+        });
+    }
+
+    public static void useGroups(String branch, String kit, Consumer<Group> post) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            Elements elements;
+
+            try {
+                Connection connection = Jsoup.connect(employeeLink);
+                HashMap<String, String> data = new HashMap<>();
+                data.put("branch", branch);
+                data.put("year", kit);
+                connection.data(data);
+                Document document = connection.post();
+                Element employee = document.getElementsByAttribute("name").stream()
+                        .filter(element -> element.attr("name").equals("group"))
+                        .collect(Collectors.toList()).get(0);
+                elements = employee.children();
+                elements.remove(0);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            handler.post(() -> elements.forEach(element -> post.accept(new Group(element.text(), element.attr("value")))));
+        });
+    }
+
     public static void useEmployees(String branch, Consumer<Employee> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
@@ -71,7 +127,7 @@ public class RucParser {
             Elements elements;
 
             try {
-                Connection connection = Jsoup.connect(link);
+                Connection connection = Jsoup.connect(employeeLink);
                 HashMap<String, String> data = new HashMap<>();
                 data.put("branch", branch);
                 connection.data(data);
@@ -89,7 +145,7 @@ public class RucParser {
         });
     }
 
-    public static void useCards(String branch, String employee, Consumer<Card> post) {
+    public static void useGroupCards(String branch, String kit, String group, Consumer<Card> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         List<Card> cardList = new ArrayList<>();
@@ -97,6 +153,68 @@ public class RucParser {
         executor.execute(() -> {
             try {
                 Connection connection = Jsoup.connect(link);
+                HashMap<String, String> data = new HashMap<>();
+                data.put("branch", branch);
+                data.put("year", kit);
+                data.put("group", group);
+                connection.data(data);
+                Document document = connection.post();
+
+                Elements cards = document.getElementsByClass("card");
+                for (Element cardElement : cards) {
+                    List<Pair> pairList = new ArrayList<>();
+                    if (cards.size() <= 1)
+                        return;
+
+                    Elements pairs = cardElement.children();
+                    Element header = pairs.get(0);
+                    pairs.remove(0);
+
+
+                    for (Element element : pairs) {
+                        String pairName = element.children().first().text();
+                        String text = element.toString().replace(pairName, "").replace("Группа", "").trim();
+                        Matcher matcher = Pattern.compile("[0-9].").matcher(pairName);
+                        matcher.find();
+                        int pairIndex = Integer.parseInt(pairName.substring(matcher.start(), matcher.end() - 1));
+                        pairName = pairName.replaceAll("[0-9].", "");
+                        String[] split = text.split("<br>");
+                        String[] split1 = split[2].split(",");
+
+                        pairList.add(new Pair(
+                                pairIndex - 1,
+                                pairName.trim(),
+                                split[1].trim(),
+                                split1[0].trim(),
+                                split1[1].trim(),
+                                split[1].trim()
+                        ));
+                    }
+
+                    String strDate = header.text().split(" ")[0];
+                    SimpleDateFormat parser = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+                    cardList.add(new Card(parser.parse(strDate), pairList));
+                }
+            } catch (Exception e) {
+                HashMap<String, String> data = new HashMap<>();
+                data.put("branch", branch);
+                data.put("year", kit);
+                data.put("group", group);
+                Log.e("RUC RucParser ", data + " : " + e);
+            }
+
+            handler.post(() -> cardList.forEach(post));
+        });
+    }
+
+    public static void useEmployeeCards(String branch, String employee, Consumer<Card> post) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        List<Card> cardList = new ArrayList<>();
+
+        executor.execute(() -> {
+            try {
+                Connection connection = Jsoup.connect(employeeLink);
                 HashMap<String, String> data = new HashMap<>();
                 data.put("branch", branch);
                 data.put("employee", employee);
