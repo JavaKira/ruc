@@ -17,4 +17,6 @@
 
     <string name="menu_schedule">Расписание</string>
     <string name="menu_settings">Настройки</string>
+    <string name="settings_switch_left">Студент</string>
+    <string name="settings_switch_right">Препод</string>
 </resources>
