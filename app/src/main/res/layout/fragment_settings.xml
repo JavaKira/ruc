@@ -113,6 +113,22 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/settings_group_recycler"
+        android:layout_width="0dp"
+        android:layout_height="617dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:background="#d7498a"
+        android:translationZ="20dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_group"
+        tools:itemCount="3"
+        tools:listitem="@layout/spinner_item" />
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/settings_kit_recycler"
         android:layout_width="0dp"
         android:layout_height="617dp"
@@ -125,7 +141,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settings_kit"
         tools:itemCount="3"
-        tools:listitem="@layout/spinner_item" />
+        tools:listitem="@layout/spinner_item" >
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/settings_branch_recycler"

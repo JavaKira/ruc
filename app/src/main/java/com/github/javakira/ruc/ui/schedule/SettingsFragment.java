@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
+import com.github.javakira.ruc.model.Group;
 import com.github.javakira.ruc.model.Kit;
 import com.github.javakira.ruc.utils.FileIO;
 import com.github.javakira.ruc.R;
@@ -44,6 +45,7 @@ public class SettingsFragment extends Fragment {
         List<SpinnerItem> items = new ArrayList<>();
         List<SpinnerItem> items1 = new ArrayList<>();
         List<SpinnerItem> items2 = new ArrayList<>();
+        List<SpinnerItem> items3 = new ArrayList<>();
         Properties properties = FileIO.loadProps(getContext());
         rucParser = new RucParser();
 
@@ -75,6 +77,19 @@ public class SettingsFragment extends Fragment {
                     FileIO.writeProps(requireContext(), properties);
                 });
 
+        SpinnerFacade groupSpinnerFacade = new SpinnerFacade(
+                binding.settingsGroupRecycler,
+                binding.settingsGroupTitle,
+                binding.settingsGroup,
+                Group.empty,
+                getContext(),
+                items3,
+                item -> {
+                    properties.setProperty("group", item.getValue());
+                    FileIO.writeProps(requireContext(), properties);
+                }
+        );
+
         SpinnerFacade kitSpinnerFacade = new SpinnerFacade(
                 binding.settingsKitRecycler,
                 binding.settingsKitTitle,
@@ -85,6 +100,11 @@ public class SettingsFragment extends Fragment {
                 item -> {
                     properties.setProperty("kit", item.getValue());
                     FileIO.writeProps(requireContext(), properties);
+                    rucParser.getGroups(properties.getProperty("branch"), item.getValue()).thenAccept((groups) -> {
+                        items3.clear();
+                        items3.addAll(groups);
+                        groupSpinnerFacade.updateBranchItemWithoutInvoke(items3.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("group"))).findAny().orElse(Group.empty));
+                    });
                 }
         );
 
