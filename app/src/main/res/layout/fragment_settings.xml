@@ -22,7 +22,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FE4B64">
+            android:background="@color/color_primary">
 
             <ImageView
                 android:id="@+id/imageView0"
@@ -69,7 +69,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FE4B64">
+            android:background="@color/color_primary">
 
             <TextView
                 android:id="@+id/settings_switch_title"
@@ -118,7 +118,7 @@
         android:layout_height="617dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:background="#d7498a"
+        android:background="@color/color_primary_dark"
         android:translationZ="20dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -134,7 +134,7 @@
         android:layout_height="617dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:background="#d7498a"
+        android:background="@color/color_primary_dark"
         android:translationZ="20dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -151,7 +151,7 @@
         android:layout_height="617dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:background="#d7498a"
+        android:background="@color/color_primary_dark"
         android:translationZ="20dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -169,7 +169,7 @@
         android:layout_height="617dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:background="#d7498a"
+        android:background="@color/color_primary_dark"
         android:translationZ="20dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
@@ -197,7 +197,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FE4B64"
+            android:background="@color/color_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -249,7 +249,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FE4B64">
+            android:background="@color/color_primary">
 
             <ImageView
                 android:id="@+id/imageView8"
@@ -298,7 +298,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FE4B64">
+            android:background="@color/color_primary">
 
             <ImageView
                 android:id="@+id/imageView9"
