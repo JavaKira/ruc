@@ -1,8 +1,5 @@
 package com.github.javakira.ruc.parser;
 
-import android.os.Debug;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import com.github.javakira.ruc.model.Branch;
@@ -11,7 +8,6 @@ import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.Group;
 import com.github.javakira.ruc.model.Kit;
 import com.github.javakira.ruc.model.Pair;
-import com.github.javakira.ruc.model.SpinnerItem;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -20,17 +16,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,11 +33,11 @@ public class RucParser {
     public static String link = "https://schedule.ruc.su/";
     public static String employeeLink = "https://schedule.ruc.su/employee/";
 
-    public void useBranches(Consumer<List<Branch>> post) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
+    private final ExecutorService executor
+            = Executors.newFixedThreadPool(2);
 
-        executor.execute(() -> {
+    public CompletableFuture<List<Branch>> getBranches() {
+        return CompletableFuture.supplyAsync(() -> {
             Elements elements;
 
             try {
@@ -58,19 +52,14 @@ public class RucParser {
                 throw new RuntimeException(e);
             }
 
-            handler.post(() -> {
-                List<Branch> branchList = new ArrayList<>();
-                elements.forEach(element -> branchList.add(new Branch(element.text(), element.attr("value"))));
-                post.accept(branchList);
-            });
-        });
+            List<Branch> branchList = new ArrayList<>();
+            elements.forEach(element -> branchList.add(new Branch(element.text(), element.attr("value"))));
+            return branchList;
+        }, executor);
     }
 
-    public void useKits(String branch, Consumer<Kit> post) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        executor.execute(() -> {
+    public CompletableFuture<List<Kit>> getKits(String branch) {
+        return CompletableFuture.supplyAsync(() -> {
             Elements elements;
 
             try {
@@ -88,15 +77,14 @@ public class RucParser {
                 throw new RuntimeException(e);
             }
 
-            handler.post(() -> elements.forEach(element -> post.accept(new Kit(element.text(), element.attr("value")))));
-        });
+            List<Kit> kits = new ArrayList<>();
+            elements.forEach(element -> kits.add(new Kit(element.text(), element.attr("value"))));
+            return kits;
+        }, executor);
     }
 
-    public void useGroups(String branch, String kit, Consumer<Group> post) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        executor.execute(() -> {
+    public CompletableFuture<List<Group>> getGroups(String branch, String kit) {
+        return CompletableFuture.supplyAsync(() -> {
             Elements elements;
 
             try {
@@ -115,15 +103,14 @@ public class RucParser {
                 throw new RuntimeException(e);
             }
 
-            handler.post(() -> elements.forEach(element -> post.accept(new Group(element.text(), element.attr("value")))));
-        });
+            List<Group> groups = new ArrayList<>();
+            elements.forEach(element -> groups.add(new Group(element.text(), element.attr("value"))));
+            return groups;
+        }, executor);
     }
 
-    public void useEmployees(String branch, Consumer<Employee> post) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-
-        executor.execute(() -> {
+    public CompletableFuture<List<Employee>> getEmployees(String branch) {
+        return CompletableFuture.supplyAsync(() -> {
             Elements elements;
 
             try {
@@ -141,16 +128,15 @@ public class RucParser {
                 throw new RuntimeException(e);
             }
 
-            handler.post(() -> elements.forEach(element -> post.accept(new Employee(element.text(), element.attr("value")))));
-        });
+            List<Employee> employees = new ArrayList<>();
+            elements.forEach(element -> employees.add(new Employee(element.text(), element.attr("value"))));
+            return employees;
+        }, executor);
     }
 
-    public void useGroupCards(String branch, String kit, String group, Consumer<Card> post) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-        List<Card> cardList = new ArrayList<>();
-
-        executor.execute(() -> {
+    public CompletableFuture<List<Card>> getGroupCards(String branch, String kit, String group) {
+        return CompletableFuture.supplyAsync((Supplier<List<Card>>) () -> {
+            List<Card> cards = new ArrayList<>();
             try {
                 Connection connection = Jsoup.connect(link);
                 HashMap<String, String> data = new HashMap<>();
@@ -160,11 +146,11 @@ public class RucParser {
                 connection.data(data);
                 Document document = connection.post();
 
-                Elements cards = document.getElementsByClass("card");
-                for (Element cardElement : cards) {
+                Elements cardElements = document.getElementsByClass("card");
+                for (Element cardElement : cardElements) {
                     List<Pair> pairList = new ArrayList<>();
                     if (cards.size() <= 1)
-                        return;
+                        return cards;
 
                     Elements pairs = cardElement.children();
                     Element header = pairs.get(0);
@@ -193,7 +179,7 @@ public class RucParser {
 
                     String strDate = header.text().split(" ")[0];
                     SimpleDateFormat parser = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
-                    cardList.add(new Card(parser.parse(strDate), pairList));
+                    cards.add(new Card(parser.parse(strDate), pairList));
                 }
             } catch (Exception e) {
                 HashMap<String, String> data = new HashMap<>();
@@ -203,16 +189,13 @@ public class RucParser {
                 Log.e("RUC RucParser ", data + " : " + e);
             }
 
-            handler.post(() -> cardList.forEach(post));
-        });
+            return cards;
+        }, executor);
     }
 
-    public void useEmployeeCards(String branch, String employee, Consumer<Card> post) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
-        List<Card> cardList = new ArrayList<>();
-
-        executor.execute(() -> {
+    public CompletableFuture<List<Card>> getEmployeeCards(String branch, String employee) {
+        return CompletableFuture.supplyAsync((Supplier<List<Card>>) () -> {
+            List<Card> cardList = new ArrayList<>();
             try {
                 Connection connection = Jsoup.connect(employeeLink);
                 HashMap<String, String> data = new HashMap<>();
@@ -225,7 +208,7 @@ public class RucParser {
                 for (Element cardElement : cards) {
                     List<Pair> pairList = new ArrayList<>();
                     if (cards.size() <= 1)
-                        return;
+                        return cardList;
 
                     Elements pairs = cardElement.children();
                     Element header = pairs.get(0);
@@ -263,7 +246,7 @@ public class RucParser {
                 Log.e("RUC RucParser ", data + " : " + e);
             }
 
-            handler.post(() -> cardList.forEach(post));
+            return cardList;
         });
     }
 }

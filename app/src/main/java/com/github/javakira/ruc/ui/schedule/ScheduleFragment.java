@@ -2,6 +2,7 @@ package com.github.javakira.ruc.ui.schedule;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class ScheduleFragment extends Fragment {
     private FragmentScheduleBinding binding;
     private RecyclerView cardRecycler;
     private View view;
+    private RucParser rucParser;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class ScheduleFragment extends Fragment {
         }
 
         cardRecycler = view.findViewById(R.id.cardRecycler);
+        rucParser = new RucParser();
         List<Card> cardList = new ArrayList<>();
         setCardRecycler(cardList);
     }
@@ -57,20 +60,19 @@ public class ScheduleFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false) {
 
         };
-        RucParser rucParser = new RucParser();
         cardRecycler = view.findViewById(R.id.cardRecycler);
         cardRecycler.setLayoutManager(layoutManager);
         CardAdapter cardAdapter = new CardAdapter(view.getContext(), cardList);
         cardRecycler.setAdapter(cardAdapter);
 
         Properties properties = FileIO.loadProps(view.getContext());
-        rucParser.useEmployeeCards(
+        rucParser.getEmployeeCards(
                 Objects.requireNonNull(properties.get("branch")).toString(),
-                Objects.requireNonNull(properties.get("employee")).toString(),
-                (Consumer<Card>) card -> {
-                    cardList.add(card);
-                    cardAdapter.notifyItemInserted(cardList.size());
-                });
+                Objects.requireNonNull(properties.get("employee")).toString()
+        ).thenAccept((cardList1 -> {
+            cardList.addAll(cardList1);
+            cardAdapter.notifyDataSetChanged();
+        }));
     }
 
     @Override
