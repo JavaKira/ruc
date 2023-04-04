@@ -2,7 +2,6 @@ package com.github.javakira.ruc.ui.schedule;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,26 +12,26 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.javakira.ruc.parser.ScheduleParser;
 import com.github.javakira.ruc.utils.FileIO;
 import com.github.javakira.ruc.R;
 import com.github.javakira.ruc.SettingsActivity;
 import com.github.javakira.ruc.adapter.CardAdapter;
 import com.github.javakira.ruc.databinding.FragmentScheduleBinding;
 import com.github.javakira.ruc.model.Card;
-import com.github.javakira.ruc.parser.RucParser;
+import com.github.javakira.ruc.parser.HtmlScheduleParser;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.function.Consumer;
 
 public class ScheduleFragment extends Fragment {
 
     private FragmentScheduleBinding binding;
     private RecyclerView cardRecycler;
     private View view;
-    private RucParser rucParser;
+    private ScheduleParser rucParser;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -51,7 +50,7 @@ public class ScheduleFragment extends Fragment {
         }
 
         cardRecycler = view.findViewById(R.id.cardRecycler);
-        rucParser = new RucParser();
+        rucParser = new HtmlScheduleParser();
         List<Card> cardList = new ArrayList<>();
         setCardRecycler(cardList);
     }

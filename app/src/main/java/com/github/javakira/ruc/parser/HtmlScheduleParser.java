@@ -29,13 +29,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class RucParser {
-    public static String link = "https://schedule.ruc.su/";
-    public static String employeeLink = "https://schedule.ruc.su/employee/";
+public class HtmlScheduleParser implements ScheduleParser {
 
     private final ExecutorService executor
             = Executors.newFixedThreadPool(2);
 
+    @Override
     public CompletableFuture<List<Branch>> getBranches() {
         return CompletableFuture.supplyAsync(() -> {
             Elements elements;
@@ -58,6 +57,7 @@ public class RucParser {
         }, executor);
     }
 
+    @Override
     public CompletableFuture<List<Kit>> getKits(String branch) {
         return CompletableFuture.supplyAsync(() -> {
             Elements elements;
@@ -83,6 +83,7 @@ public class RucParser {
         }, executor);
     }
 
+    @Override
     public CompletableFuture<List<Group>> getGroups(String branch, String kit) {
         return CompletableFuture.supplyAsync(() -> {
             Elements elements;
@@ -109,6 +110,7 @@ public class RucParser {
         }, executor);
     }
 
+    @Override
     public CompletableFuture<List<Employee>> getEmployees(String branch) {
         return CompletableFuture.supplyAsync(() -> {
             Elements elements;
@@ -134,6 +136,7 @@ public class RucParser {
         }, executor);
     }
 
+    @Override
     public CompletableFuture<List<Card>> getGroupCards(String branch, String kit, String group) {
         return CompletableFuture.supplyAsync((Supplier<List<Card>>) () -> {
             List<Card> cards = new ArrayList<>();
@@ -193,6 +196,7 @@ public class RucParser {
         }, executor);
     }
 
+    @Override
     public CompletableFuture<List<Card>> getEmployeeCards(String branch, String employee) {
         return CompletableFuture.supplyAsync((Supplier<List<Card>>) () -> {
             List<Card> cardList = new ArrayList<>();

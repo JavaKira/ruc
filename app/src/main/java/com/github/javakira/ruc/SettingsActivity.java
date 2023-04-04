@@ -8,13 +8,12 @@ import android.os.Bundle;
 import com.github.javakira.ruc.model.Branch;
 import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.SpinnerItem;
-import com.github.javakira.ruc.parser.RucParser;
+import com.github.javakira.ruc.parser.HtmlScheduleParser;
 import com.github.javakira.ruc.utils.FileIO;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Consumer;
 
 public class SettingsActivity extends AppCompatActivity {
     private SpinnerFacade branchSpinnerFacade;
@@ -27,7 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         List<SpinnerItem> items = new ArrayList<>();
         List<SpinnerItem> items1 = new ArrayList<>();
-        RucParser rucParser = new RucParser();
+        HtmlScheduleParser rucParser = new HtmlScheduleParser();
         rucParser.getBranches().thenAccept(items::addAll);
 
         branchSpinnerFacade = new SpinnerFacade(

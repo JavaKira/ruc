@@ -3,7 +3,6 @@ package com.github.javakira.ruc.ui.schedule;
 import static java.lang.Boolean.*;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.javakira.ruc.model.Group;
 import com.github.javakira.ruc.model.Kit;
+import com.github.javakira.ruc.parser.ScheduleParser;
 import com.github.javakira.ruc.utils.FileIO;
 import com.github.javakira.ruc.R;
 import com.github.javakira.ruc.SpinnerFacade;
@@ -22,7 +22,7 @@ import com.github.javakira.ruc.databinding.FragmentSettingsBinding;
 import com.github.javakira.ruc.model.Branch;
 import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.SpinnerItem;
-import com.github.javakira.ruc.parser.RucParser;
+import com.github.javakira.ruc.parser.HtmlScheduleParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.Properties;
 
 public class SettingsFragment extends Fragment {
     private FragmentSettingsBinding binding;
-    private RucParser rucParser;
+    private ScheduleParser rucParser;
 
     @Nullable
     @Override
@@ -47,7 +47,7 @@ public class SettingsFragment extends Fragment {
         List<SpinnerItem> items2 = new ArrayList<>();
         List<SpinnerItem> items3 = new ArrayList<>();
         Properties properties = FileIO.loadProps(getContext());
-        rucParser = new RucParser();
+        rucParser = new HtmlScheduleParser();
 
         SwitchCompat switchCompat = binding.switch2;
         boolean checked = parseBoolean(properties.getProperty("isEmployee"));
