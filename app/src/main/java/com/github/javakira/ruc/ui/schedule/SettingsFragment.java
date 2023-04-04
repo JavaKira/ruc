@@ -128,7 +128,7 @@ public class SettingsFragment extends Fragment {
                         items2.clear();
                         rucParser.getKits(item.getValue()).thenAccept(kits -> {
                             items2.addAll(kits);
-                            kitSpinnerFacade.updateBranchItemWithoutInvoke(items2.stream().filter(item2 -> item2.getValue().equals(properties.getProperty("kit"))).findAny().orElse(Kit.empty));
+                            kitSpinnerFacade.updateBranchItem(items2.stream().filter(item2 -> item2.getValue().equals(properties.getProperty("kit"))).findAny().orElse(Kit.empty));
                         });
                     }
                 });

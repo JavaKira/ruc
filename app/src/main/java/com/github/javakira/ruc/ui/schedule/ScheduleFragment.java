@@ -66,13 +66,24 @@ public class ScheduleFragment extends Fragment {
         cardRecycler.setAdapter(cardAdapter);
 
         Properties properties = FileIO.loadProps(view.getContext());
-        rucParser.getEmployeeCards(
-                Objects.requireNonNull(properties.get("branch")).toString(),
-                Objects.requireNonNull(properties.get("employee")).toString()
-        ).thenAccept((cardList1 -> {
-            cardList.addAll(cardList1);
-            cardAdapter.notifyDataSetChanged();
-        }));
+        if (Boolean.parseBoolean(properties.getProperty("isEmployee"))) {
+            rucParser.getEmployeeCards(
+                    Objects.requireNonNull(properties.get("branch")).toString(),
+                    Objects.requireNonNull(properties.get("employee")).toString()
+            ).thenAccept((cardList1 -> {
+                cardList.addAll(cardList1);
+                cardAdapter.notifyDataSetChanged();
+            }));
+        } else {
+            rucParser.getGroupCards(
+                    Objects.requireNonNull(properties.get("branch")).toString(),
+                    Objects.requireNonNull(properties.get("kit")).toString(),
+                    Objects.requireNonNull(properties.get("group")).toString()
+            ).thenAccept((cardList1 -> {
+                cardList.addAll(cardList1);
+                cardAdapter.notifyDataSetChanged();
+            }));
+        }
     }
 
     @Override

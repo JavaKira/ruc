@@ -149,7 +149,7 @@ public class RucParser {
                 Elements cardElements = document.getElementsByClass("card");
                 for (Element cardElement : cardElements) {
                     List<Pair> pairList = new ArrayList<>();
-                    if (cards.size() <= 1)
+                    if (cardElements.size() <= 1)
                         return cards;
 
                     Elements pairs = cardElement.children();
