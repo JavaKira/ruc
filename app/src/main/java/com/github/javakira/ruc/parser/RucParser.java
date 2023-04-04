@@ -74,7 +74,7 @@ public class RucParser {
             Elements elements;
 
             try {
-                Connection connection = Jsoup.connect(employeeLink);
+                Connection connection = Jsoup.connect(link);
                 HashMap<String, String> data = new HashMap<>();
                 data.put("branch", branch);
                 connection.data(data);
