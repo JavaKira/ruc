@@ -44,6 +44,7 @@ public class SettingsFragment extends Fragment {
         List<SpinnerItem> items1 = new ArrayList<>();
         List<SpinnerItem> items2 = new ArrayList<>();
         Properties properties = FileIO.loadProps(getContext());
+        RucParser rucParser = new RucParser();
 
         SwitchCompat switchCompat = binding.switch2;
         boolean checked = parseBoolean(properties.getProperty("isEmployee"));
@@ -98,20 +99,20 @@ public class SettingsFragment extends Fragment {
                     FileIO.writeProps(requireContext(), properties);
                     if (parseBoolean(properties.getProperty("isEmployee"))) {
                         items1.clear();
-                        RucParser.useEmployees(item.getValue(), (Consumer<Employee>) employee -> {
+                        rucParser.useEmployees(item.getValue(), (Consumer<Employee>) employee -> {
                             items1.add(employee);
                             employeeSpinnerFacade.updateBranchItemWithoutInvoke(items1.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("employee"))).findAny().orElse(Employee.empty));
                         });
                     } else {
                         items2.clear();
-                        RucParser.useKits(item.getValue(), (Consumer<Kit>) kit -> {
+                        rucParser.useKits(item.getValue(), (Consumer<Kit>) kit -> {
                             items2.add(kit);
                             kitSpinnerFacade.updateBranchItemWithoutInvoke(items2.stream().filter(item2 -> item2.getValue().equals(properties.getProperty("kit"))).findAny().orElse(Kit.empty));
                         });
                     }
                 });
 
-        RucParser.useBranches((Consumer<List<Branch>>) branchList -> {
+        rucParser.useBranches((Consumer<List<Branch>>) branchList -> {
             items.addAll(branchList);
             branchSpinnerFacade.updateBranchItem(branchList.stream().filter(item -> item.getValue().equals(properties.getProperty("branch"))).findAny().orElse(Branch.empty));
         });

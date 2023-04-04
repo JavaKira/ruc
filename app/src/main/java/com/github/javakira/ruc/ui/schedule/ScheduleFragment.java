@@ -57,13 +57,14 @@ public class ScheduleFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false) {
 
         };
+        RucParser rucParser = new RucParser();
         cardRecycler = view.findViewById(R.id.cardRecycler);
         cardRecycler.setLayoutManager(layoutManager);
         CardAdapter cardAdapter = new CardAdapter(view.getContext(), cardList);
         cardRecycler.setAdapter(cardAdapter);
 
         Properties properties = FileIO.loadProps(view.getContext());
-        RucParser.useEmployeeCards(
+        rucParser.useEmployeeCards(
                 Objects.requireNonNull(properties.get("branch")).toString(),
                 Objects.requireNonNull(properties.get("employee")).toString(),
                 (Consumer<Card>) card -> {

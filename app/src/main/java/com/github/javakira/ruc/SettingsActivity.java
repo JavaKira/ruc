@@ -27,7 +27,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         List<SpinnerItem> items = new ArrayList<>();
         List<SpinnerItem> items1 = new ArrayList<>();
-        RucParser.useBranches((Consumer<List<Branch>>) items::addAll);
+        RucParser rucParser = new RucParser();
+        rucParser.useBranches((Consumer<List<Branch>>) items::addAll);
 
         branchSpinnerFacade = new SpinnerFacade(
                 findViewById(R.id.settings_first_branch_recycler),
@@ -38,7 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
                 items,
                 item -> {
                     items1.clear();
-                    RucParser.useEmployees(item.getValue(), (Consumer<Employee>) items1::add);
+                    rucParser.useEmployees(item.getValue(), (Consumer<Employee>) items1::add);
                 });
 
 

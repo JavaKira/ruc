@@ -39,7 +39,7 @@ public class RucParser {
     public static String link = "https://schedule.ruc.su/";
     public static String employeeLink = "https://schedule.ruc.su/employee/";
 
-    public static void useBranches(Consumer<List<Branch>> post) {
+    public void useBranches(Consumer<List<Branch>> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -66,7 +66,7 @@ public class RucParser {
         });
     }
 
-    public static void useKits(String branch, Consumer<Kit> post) {
+    public void useKits(String branch, Consumer<Kit> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -92,7 +92,7 @@ public class RucParser {
         });
     }
 
-    public static void useGroups(String branch, String kit, Consumer<Group> post) {
+    public void useGroups(String branch, String kit, Consumer<Group> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -119,7 +119,7 @@ public class RucParser {
         });
     }
 
-    public static void useEmployees(String branch, Consumer<Employee> post) {
+    public void useEmployees(String branch, Consumer<Employee> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -145,7 +145,7 @@ public class RucParser {
         });
     }
 
-    public static void useGroupCards(String branch, String kit, String group, Consumer<Card> post) {
+    public void useGroupCards(String branch, String kit, String group, Consumer<Card> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         List<Card> cardList = new ArrayList<>();
@@ -207,7 +207,7 @@ public class RucParser {
         });
     }
 
-    public static void useEmployeeCards(String branch, String employee, Consumer<Card> post) {
+    public void useEmployeeCards(String branch, String employee, Consumer<Card> post) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         List<Card> cardList = new ArrayList<>();
