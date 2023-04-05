@@ -59,7 +59,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             if (date.compareTo(new Date(currentDate.getYear(), currentDate.getMonth(), currentDate.getDate() + 1)) == 0)
                 return base + "завтра";
 
-            return base + date.getDate() + "." + date.getMonth() + "." + (1900 + date.getYear());
+            return base + date.getDate() + "." + (date.getMonth() + 1) + "." + (1900 + date.getYear());
         }
 
         public CardViewHolder(@NonNull View itemView) {
