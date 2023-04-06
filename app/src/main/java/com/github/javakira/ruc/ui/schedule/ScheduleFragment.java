@@ -2,6 +2,8 @@ package com.github.javakira.ruc.ui.schedule;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +58,7 @@ public class ScheduleFragment extends Fragment {
     }
 
     private void setCardRecycler(List<Card> cardList) {
+        Handler handler = new Handler(Looper.getMainLooper());
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false) {
 
         };
@@ -70,8 +73,10 @@ public class ScheduleFragment extends Fragment {
                     Objects.requireNonNull(properties.get("branch")).toString(),
                     Objects.requireNonNull(properties.get("employee")).toString()
             ).thenAccept((cardList1 -> {
-                cardList.addAll(cardList1);
-                cardAdapter.notifyDataSetChanged();
+                handler.post(() -> {
+                    cardList.addAll(cardList1);
+                    cardAdapter.notifyDataSetChanged();
+                });
             }));
         } else {
             rucParser.getGroupCards(
@@ -79,8 +84,10 @@ public class ScheduleFragment extends Fragment {
                     Objects.requireNonNull(properties.get("kit")).toString(),
                     Objects.requireNonNull(properties.get("group")).toString()
             ).thenAccept((cardList1 -> {
-                cardList.addAll(cardList1);
-                cardAdapter.notifyDataSetChanged();
+                handler.post(() -> {
+                    cardList.addAll(cardList1);
+                    cardAdapter.notifyDataSetChanged();
+                });
             }));
         }
     }

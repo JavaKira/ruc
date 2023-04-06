@@ -3,6 +3,8 @@ package com.github.javakira.ruc.ui.schedule;
 import static java.lang.Boolean.*;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +50,7 @@ public class SettingsFragment extends Fragment {
         List<SpinnerItem> items3 = new ArrayList<>();
         Properties properties = FileIO.loadProps(getContext());
         rucParser = new HtmlScheduleParser();
+        Handler handler = new Handler(Looper.getMainLooper());
 
         SwitchCompat switchCompat = binding.switch2;
         boolean checked = parseBoolean(properties.getProperty("isEmployee"));
@@ -101,9 +104,11 @@ public class SettingsFragment extends Fragment {
                     properties.setProperty("kit", item.getValue());
                     FileIO.writeProps(requireContext(), properties);
                     rucParser.getGroups(properties.getProperty("branch"), item.getValue()).thenAccept((groups) -> {
-                        items3.clear();
-                        items3.addAll(groups);
-                        groupSpinnerFacade.updateBranchItemWithoutInvoke(items3.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("group"))).findAny().orElse(Group.empty));
+                        handler.post(() -> {
+                            items3.clear();
+                            items3.addAll(groups);
+                            groupSpinnerFacade.updateBranchItemWithoutInvoke(items3.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("group"))).findAny().orElse(Group.empty));
+                        });
                     });
                 }
         );
@@ -121,21 +126,27 @@ public class SettingsFragment extends Fragment {
                     if (parseBoolean(properties.getProperty("isEmployee"))) {
                         items1.clear();
                         rucParser.getEmployees(item.getValue()).thenAccept(employees -> {
-                            items1.addAll(employees);
-                            employeeSpinnerFacade.updateBranchItemWithoutInvoke(items1.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("employee"))).findAny().orElse(Employee.empty));
+                            handler.post(() -> {
+                                items1.addAll(employees);
+                                employeeSpinnerFacade.updateBranchItemWithoutInvoke(items1.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("employee"))).findAny().orElse(Employee.empty));
+                            });
                         });
                     } else {
                         items2.clear();
                         rucParser.getKits(item.getValue()).thenAccept(kits -> {
-                            items2.addAll(kits);
-                            kitSpinnerFacade.updateBranchItem(items2.stream().filter(item2 -> item2.getValue().equals(properties.getProperty("kit"))).findAny().orElse(Kit.empty));
+                            handler.post(() -> {
+                                items2.addAll(kits);
+                                kitSpinnerFacade.updateBranchItem(items2.stream().filter(item2 -> item2.getValue().equals(properties.getProperty("kit"))).findAny().orElse(Kit.empty));
+                            });
                         });
                     }
                 });
 
         rucParser.getBranches().thenAccept((branches) -> {
-            items.addAll(branches);
-            branchSpinnerFacade.updateBranchItem(branches.stream().filter(item -> item.getValue().equals(properties.getProperty("branch"))).findAny().orElse(Branch.empty));
+            handler.post(() -> {
+                items.addAll(branches);
+                branchSpinnerFacade.updateBranchItem(branches.stream().filter(item -> item.getValue().equals(properties.getProperty("branch"))).findAny().orElse(Branch.empty));
+            });
         });
     }
 
