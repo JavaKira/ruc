@@ -46,7 +46,7 @@ public class ScheduleFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.view = view;
 
-        if (!FileIO.isExist("config.txt", requireContext())) {
+        if (!FileIO.isExist(FileIO.propsFileName, requireContext())) {
             Intent intent = new Intent(getContext(), SettingsActivity.class);
             startActivity(intent);
             requireActivity().finish();
