@@ -19,4 +19,6 @@
     <string name="menu_settings">Настройки</string>
     <string name="settings_switch_left">Студент</string>
     <string name="settings_switch_right">Препод</string>
+    <string name="about">Автор: JavaKira\nТелеграмм: <a href="https://t.me/javapedik">@javapedik</a>\nВКонтакте: <a href="https://vk.com/javapedik">@javapedik</a>\n<a href="https://github.com/javakira/ruc">Исходный код на Github</a></string>
+    <string name="menu_about">О приложении</string>
 </resources>

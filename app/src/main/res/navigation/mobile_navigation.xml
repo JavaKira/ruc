@@ -15,4 +15,8 @@
         android:name="com.github.javakira.ruc.ui.schedule.SettingsFragment"
         android:label="@string/menu_settings" />
 
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.github.javakira.ruc.ui.schedule.AboutFragment"
+        android:label="@string/menu_about" />
 </navigation>
