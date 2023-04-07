@@ -50,6 +50,7 @@ public class ScheduleFragment extends Fragment {
             Intent intent = new Intent(getContext(), SettingsActivity.class);
             startActivity(intent);
             requireActivity().finish();
+            return;
         }
 
         cardRecycler = view.findViewById(R.id.cardRecycler);
