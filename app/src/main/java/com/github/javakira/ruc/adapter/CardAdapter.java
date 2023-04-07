@@ -76,7 +76,12 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         }
 
         private void setPairRecycler(List<Pair> pairList) {
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext(), RecyclerView.VERTICAL, false) {
+                @Override
+                public boolean canScrollVertically() {
+                    return false;
+                }
+            };
             pairRecycler = view.findViewById(R.id.pairRecycler);
             pairRecycler.setLayoutManager(layoutManager);
             PairAdapter pairAdapter = new PairAdapter(view.getContext(), pairList);
