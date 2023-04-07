@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.github.javakira.ruc.model.Group;
 import com.github.javakira.ruc.model.Kit;
@@ -33,6 +34,9 @@ import java.util.Properties;
 public class SettingsFragment extends Fragment {
     private FragmentSettingsBinding binding;
     private ScheduleParser rucParser;
+    private Handler handler;
+    private SpinnerFacade branchSpinnerFacade;
+    private List<SpinnerItem> items;
 
     @Nullable
     @Override
@@ -44,13 +48,13 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        List<SpinnerItem> items = new ArrayList<>();
+        items = new ArrayList<>();
         List<SpinnerItem> items1 = new ArrayList<>();
         List<SpinnerItem> items2 = new ArrayList<>();
         List<SpinnerItem> items3 = new ArrayList<>();
         Properties properties = FileIO.loadProps(getContext());
         rucParser = new HtmlScheduleParser();
-        Handler handler = new Handler(Looper.getMainLooper());
+        handler = new Handler(Looper.getMainLooper());
 
         SwitchCompat switchCompat = binding.switch2;
         boolean checked = parseBoolean(properties.getProperty("isEmployee"));
@@ -113,7 +117,7 @@ public class SettingsFragment extends Fragment {
                 }
         );
 
-        SpinnerFacade branchSpinnerFacade = new SpinnerFacade(
+        branchSpinnerFacade = new SpinnerFacade(
                 view.findViewById(R.id.settings_branch_recycler),
                 view.findViewById(R.id.settings_branch_title),
                 view.findViewById(R.id.spinner_title),
@@ -142,24 +146,31 @@ public class SettingsFragment extends Fragment {
                     }
                 });
 
-        rucParser.getBranches().thenAccept((branches) -> {
-            handler.post(() -> {
-                items.addAll(branches);
-                branchSpinnerFacade.updateBranchItem(branches.stream().filter(item -> item.getValue().equals(properties.getProperty("branch"))).findAny().orElse(Branch.empty));
-            });
-        });
+        updateBranches();
     }
 
     public void setStudent() {
         binding.settingsKit.setVisibility(View.VISIBLE);
         binding.settingsGroup.setVisibility(View.VISIBLE);
         binding.settingsEmployee.setVisibility(View.GONE);
+        updateBranches();
     }
 
     public void setEmployee() {
         binding.settingsKit.setVisibility(View.GONE);
         binding.settingsGroup.setVisibility(View.GONE);
         binding.settingsEmployee.setVisibility(View.VISIBLE);
+        updateBranches();
+    }
+
+    private void updateBranches() {
+        Properties properties = FileIO.loadProps(getContext());
+        rucParser.getBranches().thenAccept((branches) -> {
+            handler.post(() -> {
+                items.addAll(branches);
+                branchSpinnerFacade.updateBranchItem(branches.stream().filter(item -> item.getValue().equals(properties.getProperty("branch"))).findAny().orElse(Branch.empty));
+            });
+        });
     }
 
     @Override

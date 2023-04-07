@@ -49,6 +49,7 @@ public class ScheduleFragment extends Fragment {
         if (!FileIO.isExist("config.txt", requireContext())) {
             Intent intent = new Intent(getContext(), SettingsActivity.class);
             startActivity(intent);
+            requireActivity().finish();
         }
 
         cardRecycler = view.findViewById(R.id.cardRecycler);
