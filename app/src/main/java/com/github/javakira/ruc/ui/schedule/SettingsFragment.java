@@ -8,35 +8,35 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
+import com.github.javakira.ruc.adapter.ListAdapter;
 import com.github.javakira.ruc.model.Group;
 import com.github.javakira.ruc.model.Kit;
 import com.github.javakira.ruc.parser.ScheduleParser;
 import com.github.javakira.ruc.utils.FileIO;
-import com.github.javakira.ruc.R;
-import com.github.javakira.ruc.SpinnerFacade;
 import com.github.javakira.ruc.databinding.FragmentSettingsBinding;
 import com.github.javakira.ruc.model.Branch;
-import com.github.javakira.ruc.model.Employee;
 import com.github.javakira.ruc.model.SpinnerItem;
 import com.github.javakira.ruc.parser.HtmlScheduleParser;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class SettingsFragment extends Fragment {
     private FragmentSettingsBinding binding;
     private ScheduleParser rucParser;
     private Handler handler;
-    private SpinnerFacade branchSpinnerFacade;
-    private List<SpinnerItem> items;
+
+    private ListAdapter branchAdapter;
+    private ListAdapter employeeAdapter;
+    private ListAdapter kitAdapter;
+    private ListAdapter groupAdapter;
 
     @Nullable
     @Override
@@ -48,10 +48,6 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        items = new ArrayList<>();
-        List<SpinnerItem> items1 = new ArrayList<>();
-        List<SpinnerItem> items2 = new ArrayList<>();
-        List<SpinnerItem> items3 = new ArrayList<>();
         Properties properties = FileIO.loadProps(getContext());
         rucParser = new HtmlScheduleParser();
         handler = new Handler(Looper.getMainLooper());
@@ -72,103 +68,154 @@ public class SettingsFragment extends Fragment {
             FileIO.writeProps(requireContext(), properties);
         }));
 
-        SpinnerFacade employeeSpinnerFacade = new SpinnerFacade(
-                view.findViewById(R.id.settings_employee_recycler),
-                view.findViewById(R.id.settings_employee_title),
-                view.findViewById(R.id.settings_employee),
-                Employee.empty,
-                getContext(),
-                items1,
-                item -> {
-                    properties.setProperty("employee", item.getValue());
-                    FileIO.writeProps(requireContext(), properties);
-                });
+        binding.spinnerGroup.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Group item = (Group) groupAdapter.getItem(i);
+                properties.setProperty("group", item.getValue());
+                FileIO.writeProps(requireContext(), properties);
+            }
 
-        SpinnerFacade groupSpinnerFacade = new SpinnerFacade(
-                binding.settingsGroupRecycler,
-                binding.settingsGroupTitle,
-                binding.settingsGroup,
-                Group.empty,
-                getContext(),
-                items3,
-                item -> {
-                    properties.setProperty("group", item.getValue());
-                    FileIO.writeProps(requireContext(), properties);
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        binding.spinnerKit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Kit item = (Kit) kitAdapter.getItem(i);
+                properties.setProperty("kit", item.getValue());
+                FileIO.writeProps(requireContext(), properties);
+                updateGroups(new Branch(null, properties.getProperty("branch")), item);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        binding.spinnerEmployee.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                SpinnerItem item = employeeAdapter.getItem(i);
+                properties.setProperty("employee", item.getValue());
+                FileIO.writeProps(requireContext(), properties);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        binding.spinnerBranch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Branch item = (Branch) branchAdapter.getItem(i);
+                properties.setProperty("branch", item.getValue());
+                FileIO.writeProps(requireContext(), properties);
+                if (parseBoolean(properties.getProperty("isEmployee"))) {
+                    updateEmployees(item);
+                } else {
+                    updateKits(item);
                 }
-        );
+            }
 
-        SpinnerFacade kitSpinnerFacade = new SpinnerFacade(
-                binding.settingsKitRecycler,
-                binding.settingsKitTitle,
-                binding.settingsKit,
-                Kit.empty,
-                getContext(),
-                items2,
-                item -> {
-                    properties.setProperty("kit", item.getValue());
-                    FileIO.writeProps(requireContext(), properties);
-                    rucParser.getGroups(properties.getProperty("branch"), item.getValue()).thenAccept((groups) -> {
-                        handler.post(() -> {
-                            items3.clear();
-                            items3.addAll(groups);
-                            groupSpinnerFacade.updateBranchItemWithoutInvoke(items3.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("group"))).findAny().orElse(Group.empty));
-                        });
-                    });
-                }
-        );
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-        branchSpinnerFacade = new SpinnerFacade(
-                view.findViewById(R.id.settings_branch_recycler),
-                view.findViewById(R.id.settings_branch_title),
-                view.findViewById(R.id.spinner_title),
-                Branch.empty,
-                getContext(),
-                items,
-                item -> {
-                    properties.setProperty("branch", item.getValue());
-                    FileIO.writeProps(requireContext(), properties);
-                    if (parseBoolean(properties.getProperty("isEmployee"))) {
-                        items1.clear();
-                        rucParser.getEmployees(item.getValue()).thenAccept(employees -> {
-                            handler.post(() -> {
-                                items1.addAll(employees);
-                                employeeSpinnerFacade.updateBranchItemWithoutInvoke(items1.stream().filter(item1 -> item1.getValue().equals(properties.getProperty("employee"))).findAny().orElse(Employee.empty));
-                            });
-                        });
-                    } else {
-                        items2.clear();
-                        rucParser.getKits(item.getValue()).thenAccept(kits -> {
-                            handler.post(() -> {
-                                items2.addAll(kits);
-                                kitSpinnerFacade.updateBranchItem(items2.stream().filter(item2 -> item2.getValue().equals(properties.getProperty("kit"))).findAny().orElse(Kit.empty));
-                            });
-                        });
-                    }
-                });
+            }
+        });
 
         updateBranches();
     }
 
     public void setStudent() {
-        binding.settingsKit.setVisibility(View.VISIBLE);
-        binding.settingsGroup.setVisibility(View.VISIBLE);
-        binding.settingsEmployee.setVisibility(View.GONE);
+        binding.spinnerKit.setVisibility(View.VISIBLE);
+        binding.spinnerGroup.setVisibility(View.VISIBLE);
+        binding.spinnerEmployee.setVisibility(View.GONE);
         updateBranches();
     }
 
     public void setEmployee() {
-        binding.settingsKit.setVisibility(View.GONE);
-        binding.settingsGroup.setVisibility(View.GONE);
-        binding.settingsEmployee.setVisibility(View.VISIBLE);
+        binding.spinnerKit.setVisibility(View.GONE);
+        binding.spinnerGroup.setVisibility(View.GONE);
+        binding.spinnerEmployee.setVisibility(View.VISIBLE);
         updateBranches();
     }
 
     private void updateBranches() {
         Properties properties = FileIO.loadProps(getContext());
-        rucParser.getBranches().thenAccept((branches) -> {
+        rucParser.getBranches().thenAccept(branches -> {
             handler.post(() -> {
-                items.addAll(branches);
-                branchSpinnerFacade.updateBranchItem(branches.stream().filter(item -> item.getValue().equals(properties.getProperty("branch"))).findAny().orElse(Branch.empty));
+                branchAdapter = new ListAdapter(binding.getRoot().getContext(), branches.stream().map(branch -> (SpinnerItem) branch).collect(Collectors.toList()));
+                binding.spinnerBranch.setAdapter(branchAdapter);
+                binding.spinnerBranch.setSelection(
+                        branchAdapter.getItemList().indexOf(
+                                branchAdapter.getItemList().stream()
+                                        .filter(item -> item.getValue().equals(properties.getProperty("branch")))
+                                        .findAny()
+                                        .orElse(branchAdapter.getItem(0))
+                        )
+                );
+                //todo add default value via binding.spinnerBranch.setSelection(0);
+            });
+        });
+    }
+
+    private void updateEmployees(Branch branch) {
+        Properties properties = FileIO.loadProps(getContext());
+        rucParser.getEmployees(branch.getValue()).thenAccept(employees -> {
+            handler.post(() -> {
+                employeeAdapter = new ListAdapter(binding.getRoot().getContext(), employees.stream().map(employee -> (SpinnerItem) employee).collect(Collectors.toList()));
+                binding.spinnerEmployee.setAdapter(employeeAdapter);
+                binding.spinnerEmployee.setSelection(
+                        employeeAdapter.getItemList().indexOf(
+                                employeeAdapter.getItemList().stream()
+                                        .filter(item -> item.getValue().equals(properties.getProperty("employee")))
+                                        .findAny()
+                                        .orElse(employeeAdapter.getItem(0))
+                        )
+                );
+            });
+        });
+    }
+
+    private void updateKits(Branch branch) {
+        Properties properties = FileIO.loadProps(getContext());
+        rucParser.getKits(branch.getValue()).thenAccept(kits -> {
+            handler.post(() -> {
+                kitAdapter = new ListAdapter(binding.getRoot().getContext(), kits.stream().map(kit -> (SpinnerItem) kit).collect(Collectors.toList()));
+                binding.spinnerKit.setAdapter(kitAdapter);
+                binding.spinnerKit.setSelection(
+                        kitAdapter.getItemList().indexOf(
+                                kitAdapter.getItemList().stream()
+                                        .filter(item -> item.getValue().equals(properties.getProperty("kit")))
+                                        .findAny()
+                                        .orElse(kitAdapter.getItem(0))
+                        )
+                );
+            });
+        });
+    }
+
+    private void updateGroups(Branch branch, Kit kit) {
+        Properties properties = FileIO.loadProps(getContext());
+        rucParser.getGroups(branch.getValue(), kit.getValue()).thenAccept(groups -> {
+            handler.post(() -> {
+                groupAdapter = new ListAdapter(binding.getRoot().getContext(), groups.stream().map(group -> (SpinnerItem) group).collect(Collectors.toList()));
+                binding.spinnerGroup.setAdapter(groupAdapter);
+                binding.spinnerGroup.setSelection(
+                        groupAdapter.getItemList().indexOf(
+                                groupAdapter.getItemList().stream()
+                                        .filter(item -> item.getValue().equals(properties.getProperty("group")))
+                                        .findAny()
+                                        .orElse(groupAdapter.getItem(0))
+                        )
+                );
             });
         });
     }
